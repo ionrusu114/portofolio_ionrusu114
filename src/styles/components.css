@@ -20,9 +20,9 @@
 
   .btn-primary {
     @apply inline-flex cursor-pointer items-center gap-2 rounded-lg
-           bg-accent px-6 py-3 font-medium text-white
+           bg-accent px-6 py-3 font-medium text-text-on-accent
            transition-all duration-200
-           hover:scale-[1.02] hover:shadow-lg
+           hover:scale-[1.02] hover:shadow-[var(--shadow-glow)]
            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
            active:scale-[0.98]
            disabled:cursor-not-allowed disabled:opacity-50
@@ -33,22 +33,24 @@
     @apply inline-flex cursor-pointer items-center gap-2 rounded-lg
            border border-accent px-6 py-3 font-medium text-accent
            transition-all duration-200
-           hover:bg-accent-light
+           hover:bg-accent-dark
            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
            active:scale-[0.98]
            disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .card {
-    @apply rounded-lg border border-border bg-surface
+    @apply rounded-lg border border-border bg-bg-card
            transition-all duration-300
-           hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)];
+           hover:-translate-y-1 hover:border-accent-dark
+           hover:shadow-[var(--shadow-card-hover)];
   }
 
   .card-interactive {
-    @apply rounded-lg border border-border bg-surface
+    @apply rounded-lg border border-border bg-bg-card
            cursor-pointer transition-all duration-300
-           hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)]
+           hover:-translate-y-1 hover:border-accent-dark
+           hover:shadow-[var(--shadow-card-hover)]
            focus-visible:ring-2 focus-visible:ring-accent;
   }
 }

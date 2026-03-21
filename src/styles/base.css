@@ -47,7 +47,7 @@
   }
 
   ::selection {
-    background-color: var(--color-accent-light);
-    color: var(--color-text-primary);
+    background-color: var(--color-accent-dark);
+    color: var(--color-accent);
   }
 }
