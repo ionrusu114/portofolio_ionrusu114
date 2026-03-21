@@ -37,22 +37,24 @@ export function useHorizontalScroll(
     const targetProgress = index / (panelCount - 1)
     const scrollPosition = scrollTriggerInstance.start +
       targetProgress * (scrollTriggerInstance.end - scrollTriggerInstance.start)
-    gsap.to(window, {
-      scrollTo: scrollPosition,
-      duration: 0.8,
-      ease: 'power2.inOut',
-    })
+    window.scrollTo({ top: scrollPosition, behavior: 'smooth' })
   }
 
   onMounted(() => {
     if (!wrapperRef.value || !containerRef.value) return
+
+    const panels = gsap.utils.toArray<HTMLElement>(
+      containerRef.value.querySelectorAll(':scope > *'),
+    )
+
+    if (!panels.length) return
 
     tl = gsap.timeline({
       scrollTrigger: {
         trigger: wrapperRef.value,
         pin: true,
         start: 'top top',
-        end: () => `+=${containerRef.value!.scrollWidth - window.innerWidth}`,
+        end: () => `+=${(panelCount - 1) * window.innerWidth}`,
         scrub: scrubSpeed,
         snap: {
           snapTo: 1 / (panelCount - 1),
@@ -66,8 +68,13 @@ export function useHorizontalScroll(
       },
     })
 
+    // xPercent is relative to the container's own width
+    // Container = panelCount * 100vw, we move (panelCount-1) * 100vw
+    // As percentage of container: (panelCount-1)/panelCount * 100
+    const movePercent = ((panelCount - 1) / panelCount) * 100
+
     tl.to(containerRef.value, {
-      xPercent: -100 * (panelCount - 1) / panelCount * 100,
+      xPercent: -movePercent,
       ease: 'none',
     })
 
@@ -83,7 +90,6 @@ export function useHorizontalScroll(
     scrollTriggerInstance = null
   })
 
-  // Provide for child components
   provide(ScrollProgressKey, progress)
   provide(ScrollToPanelKey, scrollToPanel)
   provide(CurrentPanelKey, currentPanelIndex)
