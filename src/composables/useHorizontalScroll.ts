@@ -1,9 +1,10 @@
 import { ref, computed, onMounted, onUnmounted, provide, type Ref } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import { ScrollProgressKey, ScrollToPanelKey, CurrentPanelKey } from '@/types'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
 interface UseHorizontalScrollOptions {
   panelCount: number
@@ -30,24 +31,23 @@ export function useHorizontalScroll(
   )
 
   let tl: gsap.core.Timeline | null = null
-  let scrollTriggerInstance: ScrollTrigger | null = null
+  let st: ScrollTrigger | null = null
 
   function scrollToPanel(index: number): void {
-    if (!scrollTriggerInstance) return
+    if (!st) return
     const targetProgress = index / (panelCount - 1)
-    const scrollPosition = scrollTriggerInstance.start +
-      targetProgress * (scrollTriggerInstance.end - scrollTriggerInstance.start)
-    window.scrollTo({ top: scrollPosition, behavior: 'smooth' })
+    const scrollPos = st.start + targetProgress * (st.end - st.start)
+    gsap.to(window, {
+      scrollTo: { y: scrollPos, autoKill: false },
+      duration: 0.8,
+      ease: 'power2.inOut',
+    })
   }
 
   onMounted(() => {
     if (!wrapperRef.value || !containerRef.value) return
 
-    const panels = gsap.utils.toArray<HTMLElement>(
-      containerRef.value.querySelectorAll(':scope > *'),
-    )
-
-    if (!panels.length) return
+    const movePercent = ((panelCount - 1) / panelCount) * 100
 
     tl = gsap.timeline({
       scrollTrigger: {
@@ -68,26 +68,19 @@ export function useHorizontalScroll(
       },
     })
 
-    // xPercent is relative to the container's own width
-    // Container = panelCount * 100vw, we move (panelCount-1) * 100vw
-    // As percentage of container: (panelCount-1)/panelCount * 100
-    const movePercent = ((panelCount - 1) / panelCount) * 100
-
     tl.to(containerRef.value, {
       xPercent: -movePercent,
       ease: 'none',
     })
 
-    scrollTriggerInstance = ScrollTrigger.getAll().find(
-      (st) => st.vars.trigger === wrapperRef.value,
-    ) ?? null
+    // Store the ScrollTrigger instance directly
+    st = tl.scrollTrigger as ScrollTrigger
   })
 
   onUnmounted(() => {
     tl?.kill()
-    scrollTriggerInstance?.kill()
+    st = null
     tl = null
-    scrollTriggerInstance = null
   })
 
   provide(ScrollProgressKey, progress)
