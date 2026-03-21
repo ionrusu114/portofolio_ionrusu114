@@ -8,13 +8,26 @@ import {
   BiArrowUpRight,
   HiMenu,
   HiX,
+  BiTelephone,
+  BiChevronRight,
+  BiChat,
+  BiSend,
+  BiCodeSlash,
+  BiGlobe,
+  BiClipboard,
+  BiClock,
+  BiCurrencyDollar,
 } from 'oh-vue-icons/icons'
 
 import { router } from '@/router'
 import App from '@/App.vue'
 import '@/styles/main.css'
 
-addIcons(FaGithub, FaLinkedin, BiEnvelope, BiArrowRight, BiArrowUpRight, HiMenu, HiX)
+addIcons(
+  FaGithub, FaLinkedin, BiEnvelope, BiArrowRight, BiArrowUpRight, HiMenu, HiX,
+  BiTelephone, BiChevronRight, BiChat, BiSend, BiCodeSlash, BiGlobe, BiClipboard,
+  BiClock, BiCurrencyDollar,
+)
 
 const app = createApp(App)
 

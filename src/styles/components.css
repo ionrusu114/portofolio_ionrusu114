@@ -53,4 +53,50 @@
            hover:shadow-[var(--shadow-card-hover)]
            focus-visible:ring-2 focus-visible:ring-accent;
   }
+
+  .panel {
+    @apply h-screen w-screen flex-shrink-0 relative overflow-hidden;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.4), 0 0 40px rgba(0, 255, 136, 0.2);
+  }
+
+  .glow-border {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.15), inset 0 0 15px rgba(0, 255, 136, 0.05);
+  }
+
+  .nav-dot {
+    @apply h-3 w-3 rounded-full border border-border bg-transparent
+           cursor-pointer transition-all duration-300;
+  }
+
+  .nav-dot--active {
+    @apply bg-accent border-accent;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+  }
+
+  .chat-bubble {
+    @apply rounded-2xl px-4 py-3 max-w-[80%] text-sm leading-relaxed;
+  }
+
+  .chat-bubble--user {
+    @apply ml-auto bg-accent text-text-on-accent rounded-br-sm;
+  }
+
+  .chat-bubble--assistant {
+    @apply mr-auto bg-bg-elevated text-text-primary rounded-bl-sm;
+  }
+
+  .budget-card {
+    @apply rounded-lg border border-border bg-bg-card p-4
+           cursor-pointer transition-all duration-200
+           hover:border-accent-dark hover:shadow-[var(--shadow-glow)]
+           focus-visible:ring-2 focus-visible:ring-accent;
+  }
+
+  .budget-card--active {
+    @apply border-accent bg-accent-dark;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+  }
 }

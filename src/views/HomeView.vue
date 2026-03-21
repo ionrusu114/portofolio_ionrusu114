@@ -1,11 +1,26 @@
 <script setup lang="ts">
+import TheHorizontalScroller from '@/components/layout/TheHorizontalScroller.vue'
+import TheNavIndicator from '@/components/layout/TheNavIndicator.vue'
+import TheNavMenu from '@/components/layout/TheNavMenu.vue'
+import TheBackgroundCanvas from '@/components/three/TheBackgroundCanvas.vue'
+import HeroPanel from '@/components/panels/HeroPanel.vue'
+import AboutPanel from '@/components/panels/AboutPanel.vue'
+import ProjectsPanel from '@/components/panels/ProjectsPanel.vue'
+import GetOfferPanel from '@/components/panels/GetOfferPanel.vue'
+import ContactPanel from '@/components/panels/ContactPanel.vue'
 </script>
 
 <template>
-  <main class="flex min-h-screen flex-col items-center justify-center px-4">
-    <h1 class="heading-1 text-center">Ion Rusu</h1>
-    <p class="mt-4 max-w-xl text-center text-lg text-text-secondary">
-      Portfolio — Coming Soon
-    </p>
-  </main>
+  <TheBackgroundCanvas />
+
+  <TheHorizontalScroller>
+    <HeroPanel />
+    <AboutPanel />
+    <ProjectsPanel />
+    <GetOfferPanel />
+    <ContactPanel />
+  </TheHorizontalScroller>
+
+  <TheNavIndicator />
+  <TheNavMenu />
 </template>
