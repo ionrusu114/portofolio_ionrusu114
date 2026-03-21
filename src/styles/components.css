@@ -1,0 +1,54 @@
+@layer components {
+  .section-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .heading-1 {
+    @apply font-heading text-4xl font-medium tracking-tight text-text-primary
+           sm:text-5xl lg:text-6xl;
+  }
+
+  .heading-2 {
+    @apply font-heading text-2xl font-medium tracking-tight text-text-primary
+           sm:text-3xl lg:text-4xl;
+  }
+
+  .heading-3 {
+    @apply font-heading text-xl font-medium tracking-tight text-text-primary
+           sm:text-2xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-lg
+           bg-accent px-6 py-3 font-medium text-white
+           transition-all duration-200
+           hover:scale-[1.02] hover:shadow-lg
+           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
+           active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50
+           disabled:hover:scale-100 disabled:hover:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-lg
+           border border-accent px-6 py-3 font-medium text-accent
+           transition-all duration-200
+           hover:bg-accent-light
+           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
+           active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .card {
+    @apply rounded-lg border border-border bg-surface
+           transition-all duration-300
+           hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)];
+  }
+
+  .card-interactive {
+    @apply rounded-lg border border-border bg-surface
+           cursor-pointer transition-all duration-300
+           hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)]
+           focus-visible:ring-2 focus-visible:ring-accent;
+  }
+}
