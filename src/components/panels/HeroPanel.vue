@@ -35,17 +35,24 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
         </div>
       </div>
 
-      <!-- Photo placeholder -->
-      <div class="relative flex-shrink-0">
+      <!-- Profile Photo -->
+      <div class="relative flex-shrink-0 group lg:ml-8">
+        <!-- Decorative background offset -->
+        <div class="absolute -right-4 -bottom-4 z-0 h-full w-full rounded-2xl border border-accent/30 bg-accent/5 transition-transform duration-700 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
+        
         <div
-          class="h-64 w-64 overflow-hidden rounded-2xl border border-border
-                 bg-bg-elevated sm:h-80 sm:w-80 lg:h-96 lg:w-96"
+          class="relative z-10 h-64 w-64 overflow-hidden rounded-2xl border border-border
+                 bg-bg-elevated sm:h-80 sm:w-80 lg:h-96 lg:w-96 shadow-2xl"
         >
-          <div class="flex h-full w-full items-center justify-center text-text-muted">
-            <VIcon name="bi-code-slash" scale="4" class="opacity-20" />
-          </div>
+          <img 
+            src="/images/edited.png" 
+            alt="Ion Rusu" 
+            class="h-full w-full object-cover object-top grayscale-[0.4] transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" 
+          />
+          <!-- Gradient overlay for smooth blending with the dark theme -->
+          <div class="absolute inset-0 bg-gradient-to-t from-bg-bg-card/90 via-transparent to-transparent opacity-80 mix-blend-multiply"></div>
         </div>
-        <div class="glow-border absolute -inset-1 -z-10 rounded-2xl opacity-50" />
+        <div class="glow-border absolute -inset-1 -z-10 rounded-2xl opacity-50 transition-opacity duration-700 group-hover:opacity-100" />
       </div>
     </div>
   </BasePanel>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, inject } from 'vue'
-import { useThreeBackground } from '@/composables/useThreeBackground'
+import { useRealisticThreeScene } from '@/composables/useRealisticThreeScene'
 import { useMediaQuery } from '@/composables/useMediaQuery'
 import { ScrollProgressKey } from '@/types'
 
@@ -8,8 +8,9 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const scrollProgress = inject(ScrollProgressKey, ref(0))
 const isMobile = useMediaQuery('(max-width: 768px)')
 
-useThreeBackground(canvasRef, scrollProgress, {
-  particleCount: isMobile.value ? 200 : 600,
+// Use the new realistic 3D scene (deep particle field, bokeh, floating glass)
+useRealisticThreeScene(canvasRef, scrollProgress, {
+  particleCount: isMobile.value ? 500 : 2500,
 })
 </script>
 

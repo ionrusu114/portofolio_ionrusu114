@@ -2,8 +2,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TheBackgroundCanvas from '../TheBackgroundCanvas.vue'
 
-vi.mock('@/composables/useThreeBackground', () => ({
-  useThreeBackground: vi.fn(() => ({ dispose: vi.fn() })),
+vi.mock('@/composables/useRealisticThreeScene', () => ({
+  useRealisticThreeScene: vi.fn(() => ({ dispose: vi.fn() })),
 }))
 
 vi.mock('@/composables/useMediaQuery', () => ({
