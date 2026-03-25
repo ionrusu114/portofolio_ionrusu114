@@ -1,12 +1,9 @@
 node_modules
 dist
-dist-ssr
-coverage
 .git
-.gitignore
-.env.local
-.env.*.local
-*.log
+.github
 *.md
-.vscode
-.idea
+.env
+.env.*
+vitest_output.txt
+docs
