@@ -14,6 +14,7 @@ const {
   isLoading,
   isRateLimited,
   canSendMessage,
+  typingMessageId,
   initialize,
   selectLanguage,
   sendMessage,
@@ -60,20 +61,27 @@ function handleContact(contact: { email: string; phone: string }): void {
   submitContact(contact)
 }
 
-function scrollToBottom(): void {
+function scrollToMessage(msgId?: string): void {
   nextTick(() => {
-    if (messagesContainer.value) {
-      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+    if (!messagesContainer.value) return
+    if (msgId) {
+      const el = messagesContainer.value.querySelector(`[data-msg-id="${msgId}"]`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        return
+      }
     }
+    // Fallback: scroll to bottom
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
   })
 }
 
 watch(
   () => messages.value.length,
-  () => scrollToBottom(),
+  () => scrollToMessage(typingMessageId.value ?? undefined),
 )
 
-watch(isLoading, () => scrollToBottom())
+watch(isLoading, () => scrollToMessage())
 
 onMounted(() => {
   initialize()
@@ -121,12 +129,14 @@ onMounted(() => {
         <!-- Action message (language/budget/timeline/confirm buttons) -->
         <ChatActionMessage
           v-if="msg.actionType && msg.actionType !== 'custom-budget' && msg.actionType !== 'contact-form'"
+          :data-msg-id="msg.id"
+          :class="{ 'typing-reveal': msg.role === 'assistant' && typingMessageId === msg.id }"
           :message="msg"
           @select="(id) => handleActionSelect(id, msg.actionType!)"
         />
 
         <!-- Custom budget input -->
-        <div v-else-if="msg.actionType === 'custom-budget'" class="flex flex-col gap-2">
+        <div v-else-if="msg.actionType === 'custom-budget'" :data-msg-id="msg.id" :class="{ 'typing-reveal': msg.role === 'assistant' && typingMessageId === msg.id }" class="flex flex-col gap-2">
           <BaseChatBubble role="assistant">{{ msg.content }}</BaseChatBubble>
           <ChatCustomBudgetInput
             v-if="currentStep === 'custom-budget'"
@@ -135,7 +145,7 @@ onMounted(() => {
         </div>
 
         <!-- Contact form -->
-        <div v-else-if="msg.actionType === 'contact-form'" class="flex flex-col gap-2">
+        <div v-else-if="msg.actionType === 'contact-form'" :data-msg-id="msg.id" :class="{ 'typing-reveal': msg.role === 'assistant' && typingMessageId === msg.id }" class="flex flex-col gap-2">
           <BaseChatBubble role="assistant">{{ msg.content }}</BaseChatBubble>
           <ChatContactForm
             v-if="currentStep === 'awaiting-contact'"
@@ -144,13 +154,13 @@ onMounted(() => {
         </div>
 
         <!-- Offer card -->
-        <div v-else-if="msg.offer" class="flex flex-col gap-2">
+        <div v-else-if="msg.offer" :data-msg-id="msg.id" :class="{ 'typing-reveal': msg.role === 'assistant' && typingMessageId === msg.id }" class="flex flex-col gap-2">
           <BaseChatBubble role="assistant">{{ msg.content }}</BaseChatBubble>
           <ChatOfferCard :offer="msg.offer" />
         </div>
 
         <!-- Regular text message -->
-        <BaseChatBubble v-else :role="msg.role">
+        <BaseChatBubble v-else :data-msg-id="msg.id" :class="{ 'typing-reveal': msg.role === 'assistant' && typingMessageId === msg.id }" :role="msg.role">
           {{ msg.content }}
         </BaseChatBubble>
       </template>
@@ -215,5 +225,30 @@ onMounted(() => {
 .chat-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 255, 136, 0.2) transparent;
+}
+
+/* Typing reveal animation */
+.typing-reveal {
+  overflow: hidden;
+  animation: typing-reveal 0.8s ease-out forwards;
+}
+
+@keyframes typing-reveal {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+/* Smaller text on mobile */
+@media (max-width: 767px) {
+  :deep(.chat-bubble) {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 </style>

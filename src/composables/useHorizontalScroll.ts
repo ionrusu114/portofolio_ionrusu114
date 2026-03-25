@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted, provide, type Ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted, provide, watch, type Ref } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
@@ -154,6 +154,16 @@ export function useHorizontalScroll(
     } else {
       setupDesktop()
     }
+
+    // Restore tab from URL
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')
+    if (tabParam) {
+      const tabIndex = parseInt(tabParam, 10)
+      if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < panelCount) {
+        setTimeout(() => scrollToPanel(tabIndex), 100)
+      }
+    }
   })
 
   onUnmounted(() => {
@@ -168,6 +178,17 @@ export function useHorizontalScroll(
   provide(ScrollProgressKey, progress)
   provide(ScrollToPanelKey, scrollToPanel)
   provide(CurrentPanelKey, currentPanelIndex)
+
+  // Sync panel index to URL
+  watch(currentPanelIndex, (index) => {
+    const url = new URL(window.location.href)
+    if (index === 0) {
+      url.searchParams.delete('tab')
+    } else {
+      url.searchParams.set('tab', String(index))
+    }
+    window.history.replaceState({}, '', url.toString())
+  })
 
   return {
     progress,

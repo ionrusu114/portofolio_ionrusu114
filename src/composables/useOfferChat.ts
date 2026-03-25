@@ -54,12 +54,54 @@ export function useOfferChat() {
   const currentOffer = ref<GeneratedOffer | null>(null)
   const selectedLanguage = ref('en')
   const clientContact = ref<ClientContact | null>(null)
+  const typingMessageId = ref<string | null>(null)
 
   const { analyzeProject, generateOffer } = useGeminiApi()
 
   const canSendMessage = computed(() => currentStep.value === 'awaiting-description')
 
+  function saveState(): void {
+    sessionStorage.setItem('portfolio_chat_state', JSON.stringify({
+      messages: messages.value,
+      currentStep: currentStep.value,
+      projectDescription: projectDescription.value,
+      selectedBudget: selectedBudget.value,
+      selectedTimeline: selectedTimeline.value,
+      language: selectedLanguage.value,
+      currentAnalysis: currentAnalysis.value,
+      currentOffer: currentOffer.value,
+    }))
+  }
+
+  function addAssistantMessage(content: string, extra?: Partial<OfferChatMessage>): OfferChatMessage {
+    const msg = createMessage('assistant', content, extra)
+    messages.value.push(msg)
+    typingMessageId.value = msg.id
+    return msg
+  }
+
   function initialize(): void {
+    // Try restore from sessionStorage
+    const saved = sessionStorage.getItem('portfolio_chat_state')
+    if (saved) {
+      try {
+        const state = JSON.parse(saved)
+        messages.value = state.messages || []
+        currentStep.value = state.currentStep || 'greeting'
+        projectDescription.value = state.projectDescription || ''
+        selectedBudget.value = state.selectedBudget || null
+        selectedTimeline.value = state.selectedTimeline || null
+        selectedLanguage.value = state.language || 'en'
+        currentAnalysis.value = state.currentAnalysis || null
+        currentOffer.value = state.currentOffer || null
+        // Don't restore if completed/declined/sending
+        if (['completed', 'declined', 'sending-email', 'rate-limited'].includes(currentStep.value)) {
+          // Already done, keep as is
+        }
+        return
+      } catch { /* ignore corrupt data */ }
+    }
+
     if (getSessionCount() >= MAX_SESSIONS) {
       isRateLimited.value = true
       currentStep.value = 'rate-limited'
@@ -67,23 +109,35 @@ export function useOfferChat() {
     }
 
     messages.value = [
-      createMessage(
-        'assistant',
-        'Hi! Welcome to Ion Rusu\'s project estimator. First, please select your preferred language:',
-        {
-          actionType: 'language-select',
-          actions: LANGUAGES.map((lang) => ({
-            id: lang.id,
-            label: `${lang.flag} ${lang.label}`,
-            value: lang.id,
-          })),
-        },
-      ),
+      createMessage('assistant', "Hi! I'm Ion's project assistant. I'll help you get a quick estimate for your web or software project.", {
+        actionType: 'language-select',
+        actions: [{ id: 'start', label: 'Get Started', value: 'start' }],
+      }),
     ]
-    currentStep.value = 'awaiting-language'
+    currentStep.value = 'greeting'
   }
 
   function selectLanguage(langId: string): void {
+    // Handle "Get Started" button
+    if (langId === 'start') {
+      const lastMsg = [...messages.value].reverse().find(m => m.actionType === 'language-select')
+      if (lastMsg?.actions) {
+        lastMsg.actions = lastMsg.actions.map(a => ({ ...a, disabled: true, selected: a.id === 'start' }))
+      }
+
+      addAssistantMessage('Please select your preferred language:', {
+        actionType: 'language-select',
+        actions: LANGUAGES.map((lang) => ({
+          id: lang.id,
+          label: `${lang.flag} ${lang.label}`,
+          value: lang.id,
+        })),
+      })
+      currentStep.value = 'awaiting-language'
+      saveState()
+      return
+    }
+
     if (currentStep.value !== 'awaiting-language') return
 
     const lang = LANGUAGES.find((l) => l.id === langId)
@@ -113,10 +167,9 @@ export function useOfferChat() {
       pt: '\u00D3timo! Por favor, descreva o projeto web ou de software que tem em mente. Quanto mais detalhes fornecer, mais precisa ser\u00E1 a estimativa.',
     }
 
-    messages.value.push(
-      createMessage('assistant', greetings[langId] || greetings.en),
-    )
+    addAssistantMessage(greetings[langId] || greetings.en)
     currentStep.value = 'awaiting-description'
+    saveState()
   }
 
   async function sendMessage(content: string): Promise<void> {
@@ -127,9 +180,8 @@ export function useOfferChat() {
         ro: 'Pute\u021Bi oferi mai multe detalii? V\u0103 rog descrie\u021Bi proiectul \u00EEn c\u00E2teva propozi\u021Bii.',
         ru: '\u041D\u0435 \u043C\u043E\u0433\u043B\u0438 \u0431\u044B \u0432\u044B \u043F\u0440\u0435\u0434\u043E\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0431\u043E\u043B\u044C\u0448\u0435 \u0434\u0435\u0442\u0430\u043B\u0435\u0439? \u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u043E\u043F\u0438\u0448\u0438\u0442\u0435 \u043F\u0440\u043E\u0435\u043A\u0442 \u0432 \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u0438\u0445 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F\u0445.',
       }
-      messages.value.push(
-        createMessage('assistant', shortMsgs[selectedLanguage.value] || shortMsgs.en),
-      )
+      addAssistantMessage(shortMsgs[selectedLanguage.value] || shortMsgs.en)
+      saveState()
       return
     }
 
@@ -164,25 +216,22 @@ export function useOfferChat() {
         ru: `\u0412\u043E\u0442 \u043C\u043E\u0439 \u0430\u043D\u0430\u043B\u0438\u0437: ${analysis.summary}\n\n\u041D\u0430 \u043E\u0441\u043D\u043E\u0432\u0435 \u0441\u043B\u043E\u0436\u043D\u043E\u0441\u0442\u0438 \u043F\u0440\u043E\u0435\u043A\u0442\u0430, \u0432\u043E\u0442 \u0434\u0438\u0430\u043F\u0430\u0437\u043E\u043D\u044B \u0431\u044E\u0434\u0436\u0435\u0442\u0430:`,
       }
 
-      messages.value.push(
-        createMessage('assistant', budgetIntros[selectedLanguage.value] || budgetIntros.en, {
-          actionType: 'budget-select',
-          actions: budgetActions,
-        }),
-      )
+      addAssistantMessage(budgetIntros[selectedLanguage.value] || budgetIntros.en, {
+        actionType: 'budget-select',
+        actions: budgetActions,
+      })
 
       currentStep.value = 'awaiting-budget'
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong'
       error.value = msg
-      messages.value.push(
-        createMessage('assistant', selectedLanguage.value === 'ro'
-          ? 'A ap\u0103rut o eroare la analizarea proiectului. V\u0103 rog \u00EEncerca\u021Bi din nou.'
-          : 'Something went wrong while analyzing your project. Please try again.'),
-      )
+      addAssistantMessage(selectedLanguage.value === 'ro'
+        ? 'A ap\u0103rut o eroare la analizarea proiectului. V\u0103 rog \u00EEncerca\u021Bi din nou.'
+        : 'Something went wrong while analyzing your project. Please try again.')
       currentStep.value = 'awaiting-description'
     } finally {
       isLoading.value = false
+      saveState()
     }
   }
 
@@ -200,14 +249,13 @@ export function useOfferChat() {
 
     if (actionId === 'custom') {
       currentStep.value = 'custom-budget'
-      messages.value.push(
-        createMessage('assistant',
-          selectedLanguage.value === 'ro' ? 'Introduce\u021Bi intervalul de buget preferat:' :
-          selectedLanguage.value === 'ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0442\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0434\u0438\u0430\u043F\u0430\u0437\u043E\u043D \u0431\u044E\u0434\u0436\u0435\u0442\u0430:' :
-          'Please enter your preferred budget range:', {
-          actionType: 'custom-budget',
-        }),
-      )
+      addAssistantMessage(
+        selectedLanguage.value === 'ro' ? 'Introduce\u021Bi intervalul de buget preferat:' :
+        selectedLanguage.value === 'ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0442\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0434\u0438\u0430\u043F\u0430\u0437\u043E\u043D \u0431\u044E\u0434\u0436\u0435\u0442\u0430:' :
+        'Please enter your preferred budget range:', {
+        actionType: 'custom-budget',
+      })
+      saveState()
       return
     }
 
@@ -219,6 +267,7 @@ export function useOfferChat() {
 
     messages.value.push(createMessage('user', `Budget: ${action.description}`))
     proceedToTimeline()
+    saveState()
   }
 
   function submitCustomBudget(min: number, max: number): void {
@@ -228,6 +277,7 @@ export function useOfferChat() {
     selectedBudget.value = { min, max, label: `Custom: \u20AC${min.toLocaleString()} - \u20AC${max.toLocaleString()}` }
     messages.value.push(createMessage('user', `Budget: \u20AC${min.toLocaleString()} - \u20AC${max.toLocaleString()}`))
     proceedToTimeline()
+    saveState()
   }
 
   function proceedToTimeline(): void {
@@ -246,12 +296,10 @@ export function useOfferChat() {
       ru: '\u041A\u0430\u043A\u0438\u0435 \u0441\u0440\u043E\u043A\u0438 \u0432\u0430\u043C \u043F\u043E\u0434\u0445\u043E\u0434\u044F\u0442?',
     }
 
-    messages.value.push(
-      createMessage('assistant', timelineIntros[selectedLanguage.value] || timelineIntros.en, {
-        actionType: 'timeline-select',
-        actions: timelineActions,
-      }),
-    )
+    addAssistantMessage(timelineIntros[selectedLanguage.value] || timelineIntros.en, {
+      actionType: 'timeline-select',
+      actions: timelineActions,
+    })
 
     currentStep.value = 'awaiting-timeline'
   }
@@ -290,12 +338,10 @@ export function useOfferChat() {
       )
       currentOffer.value = offer
 
-      messages.value.push(
-        createMessage('assistant',
-          selectedLanguage.value === 'ro' ? 'Iat\u0103 estimarea proiectului dumneavoastr\u0103:' :
-          selectedLanguage.value === 'ru' ? '\u0412\u043E\u0442 \u043E\u0446\u0435\u043D\u043A\u0430 \u0432\u0430\u0448\u0435\u0433\u043E \u043F\u0440\u043E\u0435\u043A\u0442\u0430:' :
-          'Here\'s your project estimate:', { offer }),
-      )
+      addAssistantMessage(
+        selectedLanguage.value === 'ro' ? 'Iat\u0103 estimarea proiectului dumneavoastr\u0103:' :
+        selectedLanguage.value === 'ru' ? '\u0412\u043E\u0442 \u043E\u0446\u0435\u043D\u043A\u0430 \u0432\u0430\u0448\u0435\u0433\u043E \u043F\u0440\u043E\u0435\u043A\u0442\u0430:' :
+        'Here\'s your project estimate:', { offer })
 
       const confirmLabels: Record<string, { accept: string; decline: string }> = {
         en: { accept: 'I like it!', decline: 'Not for me' },
@@ -310,26 +356,23 @@ export function useOfferChat() {
         ru: '\u0425\u043E\u0442\u0438\u0442\u0435 \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C \u0441 \u044D\u0442\u043E\u0439 \u043E\u0446\u0435\u043D\u043A\u043E\u0439?',
       }
 
-      messages.value.push(
-        createMessage('assistant', confirmIntros[selectedLanguage.value] || confirmIntros.en, {
-          actionType: 'offer-confirm',
-          actions: [
-            { id: 'accept', label: labels.accept, value: 'accept' },
-            { id: 'decline', label: labels.decline, value: 'decline' },
-          ],
-        }),
-      )
+      addAssistantMessage(confirmIntros[selectedLanguage.value] || confirmIntros.en, {
+        actionType: 'offer-confirm',
+        actions: [
+          { id: 'accept', label: labels.accept, value: 'accept' },
+          { id: 'decline', label: labels.decline, value: 'decline' },
+        ],
+      })
 
       currentStep.value = 'offer-presented'
     } catch {
-      messages.value.push(
-        createMessage('assistant',
-          selectedLanguage.value === 'ro' ? 'Am \u00EEnt\u00E2mpinat o eroare. V\u0103 rog \u00EEncerca\u021Bi din nou.' :
-          'I had trouble generating your offer. Please try describing your project again.'),
-      )
+      addAssistantMessage(
+        selectedLanguage.value === 'ro' ? 'Am \u00EEnt\u00E2mpinat o eroare. V\u0103 rog \u00EEncerca\u021Bi din nou.' :
+        'I had trouble generating your offer. Please try describing your project again.')
       currentStep.value = 'awaiting-description'
     } finally {
       isLoading.value = false
+      saveState()
     }
   }
 
@@ -359,13 +402,12 @@ export function useOfferChat() {
         ru: '\u041E\u0442\u043B\u0438\u0447\u043D\u044B\u0439 \u0432\u044B\u0431\u043E\u0440! \u0427\u0442\u043E\u0431\u044B \u043E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0432\u0430\u043C \u0434\u0435\u0442\u0430\u043B\u0438 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F, \u043F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0443\u043A\u0430\u0436\u0438\u0442\u0435 \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435:',
       }
 
-      messages.value.push(
-        createMessage('assistant', contactMsgs[selectedLanguage.value] || contactMsgs.en, {
-          actionType: 'contact-form',
-        }),
-      )
+      addAssistantMessage(contactMsgs[selectedLanguage.value] || contactMsgs.en, {
+        actionType: 'contact-form',
+      })
 
       currentStep.value = 'awaiting-contact'
+      saveState()
     } else {
       declineOffer()
     }
@@ -406,22 +448,19 @@ export function useOfferChat() {
         ru: `\u0421\u043F\u0430\u0441\u0438\u0431\u043E, ${contact.email}! \u0412\u0430\u0448 \u0437\u0430\u043F\u0440\u043E\u0441 \u043D\u0430 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u0431\u044B\u043B \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D \u0418\u043E\u043D\u0443 \u0420\u0443\u0441\u0443. \u041E\u043D \u0440\u0430\u0441\u0441\u043C\u043E\u0442\u0440\u0438\u0442 \u0434\u0435\u0442\u0430\u043B\u0438 \u0432\u0430\u0448\u0435\u0433\u043E \u043F\u0440\u043E\u0435\u043A\u0442\u0430 \u0438 \u0441\u0432\u044F\u0436\u0435\u0442\u0441\u044F \u0441 \u0432\u0430\u043C\u0438 \u0432 \u0431\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u0435 \u0432\u0440\u0435\u043C\u044F.`,
       }
 
-      messages.value.push(
-        createMessage('assistant', successMsgs[selectedLanguage.value] || successMsgs.en),
-      )
+      addAssistantMessage(successMsgs[selectedLanguage.value] || successMsgs.en)
 
       currentStep.value = 'completed'
     } catch {
-      messages.value.push(
-        createMessage('assistant',
-          selectedLanguage.value === 'ro'
-            ? 'Nu am putut trimite oferta. Contacta\u021Bi-l pe Ion direct la ionrusu114@gmail.com'
-            : 'Couldn\'t send the offer. Contact Ion directly at ionrusu114@gmail.com'),
-      )
+      addAssistantMessage(
+        selectedLanguage.value === 'ro'
+          ? 'Nu am putut trimite oferta. Contacta\u021Bi-l pe Ion direct la ionrusu114@gmail.com'
+          : 'Couldn\'t send the offer. Contact Ion directly at ionrusu114@gmail.com')
       currentStep.value = 'completed'
       incrementSessionCount()
     } finally {
       isLoading.value = false
+      saveState()
     }
   }
 
@@ -441,11 +480,10 @@ export function useOfferChat() {
       ru: '\u0411\u0435\u0437 \u043F\u0440\u043E\u0431\u043B\u0435\u043C! \u0415\u0441\u043B\u0438 \u043F\u0435\u0440\u0435\u0434\u0443\u043C\u0430\u0435\u0442\u0435, \u0432\u043E\u0437\u0432\u0440\u0430\u0449\u0430\u0439\u0442\u0435\u0441\u044C. \u0422\u0430\u043A\u0436\u0435 \u043C\u043E\u0436\u0435\u0442\u0435 \u0441\u0432\u044F\u0437\u0430\u0442\u044C\u0441\u044F \u0441 \u0418\u043E\u043D\u043E\u043C \u043D\u0430\u043F\u0440\u044F\u043C\u0443\u044E: ionrusu114@gmail.com.',
     }
 
-    messages.value.push(
-      createMessage('assistant', closingMsgs[selectedLanguage.value] || closingMsgs.en),
-    )
+    addAssistantMessage(closingMsgs[selectedLanguage.value] || closingMsgs.en)
 
     currentStep.value = 'declined'
+    saveState()
   }
 
   return {
@@ -456,6 +494,7 @@ export function useOfferChat() {
     isRateLimited,
     canSendMessage,
     selectedLanguage,
+    typingMessageId,
     initialize,
     selectLanguage,
     sendMessage,
