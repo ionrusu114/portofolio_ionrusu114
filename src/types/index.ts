@@ -77,3 +77,80 @@ export interface ChatMessage {
 export const ScrollProgressKey: InjectionKey<Ref<number>> = Symbol('scrollProgress')
 export const ScrollToPanelKey: InjectionKey<(index: number) => void> = Symbol('scrollToPanel')
 export const CurrentPanelKey: InjectionKey<Ref<number>> = Symbol('currentPanelIndex')
+
+// === Offer Chat Types ===
+
+export type OfferFlowStep =
+  | 'rate-limited'
+  | 'greeting'
+  | 'awaiting-description'
+  | 'analyzing'
+  | 'awaiting-budget'
+  | 'custom-budget'
+  | 'awaiting-timeline'
+  | 'generating-offer'
+  | 'offer-presented'
+  | 'sending-email'
+  | 'completed'
+  | 'declined'
+  | 'error'
+
+export type ChatActionType = 'budget-select' | 'timeline-select' | 'offer-confirm' | 'custom-budget'
+
+export interface ChatAction {
+  id: string
+  label: string
+  value: string
+  description?: string
+  disabled?: boolean
+  selected?: boolean
+}
+
+export interface OfferChatMessage extends ChatMessage {
+  actionType?: ChatActionType
+  actions?: ChatAction[]
+  offer?: GeneratedOffer
+  isLoading?: boolean
+}
+
+export interface ProjectAnalysis {
+  summary: string
+  complexity: 'simple' | 'moderate' | 'complex' | 'enterprise'
+  suggestedBudgetRanges: Array<{
+    id: string
+    label: string
+    min: number
+    max: number
+  }>
+  suggestedTimelines: Array<{
+    id: string
+    label: string
+    weeks: number
+    description: string
+  }>
+  error?: string
+}
+
+export interface GeneratedOffer {
+  projectSummary: string
+  hoursBreakdown: Array<{
+    task: string
+    estimatedHours: number
+  }>
+  totalHoursMin: number
+  totalHoursMax: number
+  ratePerHour: number
+  totalMin: number
+  totalMax: number
+  currency: 'EUR'
+  contractType: 'B2B'
+  disclaimer: string
+}
+
+export interface OfferEmailPayload {
+  projectDescription: string
+  selectedBudget: string
+  selectedTimeline: string
+  generatedOffer: GeneratedOffer
+  timestamp: number
+}
