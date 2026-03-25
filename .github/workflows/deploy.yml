@@ -37,15 +37,4 @@ jobs:
             VITE_APP_GAS_WEBHOOK_URL=${{ secrets.VITE_APP_GAS_WEBHOOK_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /root/docker/composes/portfolio
-            docker compose pull
-            docker compose up -d
-            docker image prune -f
+      # Watchtower on server auto-pulls new images every 60s
