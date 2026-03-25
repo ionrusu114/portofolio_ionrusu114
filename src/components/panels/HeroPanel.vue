@@ -30,8 +30,8 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
             View Projects
             <VIcon name="bi-arrow-right" scale="0.9" />
           </button>
-          <button class="btn-secondary" @click="scrollToPanel(4)">
-            Get in Touch
+          <button class="btn-secondary" @click="scrollToPanel(3)">
+            Get an Offer
           </button>
         </div>
       </div>
