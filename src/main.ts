@@ -37,7 +37,7 @@ import {
   SiExpress,
 } from 'oh-vue-icons/icons'
 
-import { createHead } from '@unhead/vue'
+import { createHead } from '@unhead/vue/client'
 import { router } from '@/router'
 import App from '@/App.vue'
 import '@/styles/main.css'
