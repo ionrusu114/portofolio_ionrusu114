@@ -16,22 +16,22 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
                 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
       <!-- Text content -->
       <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
-        <p class="mb-2 font-mono text-sm text-text-muted">// hello, I'm</p>
-        <h1 class="font-heading text-[length:var(--text-fluid-hero)] font-medium tracking-tight">
+        <p class="mb-1 font-mono text-xs text-text-muted md:mb-2 md:text-sm">// hello, I'm</p>
+        <h1 class="font-heading text-3xl font-medium tracking-tight sm:text-4xl md:text-[length:var(--text-fluid-hero)]">
           <BaseGlowText tag="span">{{ personal.name }}</BaseGlowText>
         </h1>
-        <p class="mt-4 max-w-lg text-lg text-text-secondary sm:text-xl">
+        <p class="mt-2 max-w-lg text-sm text-text-secondary sm:text-base md:mt-4 md:text-xl">
           {{ personal.title }}
         </p>
-        <p class="mt-2 font-mono text-sm text-accent">
+        <p class="mt-1 font-mono text-xs text-accent md:mt-2 md:text-sm">
           {{ personal.experience }} years of experience
         </p>
-        <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <button class="btn-primary" @click="scrollToPanel(2)">
+        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-4 md:mt-8">
+          <button class="btn-primary text-sm md:text-base" @click="scrollToPanel(2)">
             View Projects
             <VIcon name="bi-arrow-right" scale="0.9" />
           </button>
-          <button class="btn-secondary" @click="scrollToPanel(3)">
+          <button class="btn-secondary text-sm md:text-base" @click="scrollToPanel(3)">
             Get an Offer
           </button>
         </div>
@@ -43,8 +43,8 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
         <div class="absolute -right-4 -bottom-4 z-0 h-full w-full rounded-2xl border border-accent/30 bg-accent/5 transition-transform duration-700 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
         
         <div
-          class="relative z-10 h-64 w-64 overflow-hidden rounded-2xl border border-border
-                 bg-bg-elevated sm:h-80 sm:w-80 lg:h-96 lg:w-96 shadow-2xl"
+          class="relative z-10 h-48 w-48 overflow-hidden rounded-2xl border border-border
+                 bg-bg-elevated sm:h-64 sm:w-64 md:h-80 md:w-80 lg:h-96 lg:w-96 shadow-2xl"
         >
           <img 
             src="/images/edited.png" 

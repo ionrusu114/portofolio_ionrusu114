@@ -28,19 +28,26 @@ const { isMobile, currentPanelIndex, scrollToPanel } = useHorizontalScroll(wrapp
       <slot />
     </div>
 
-    <!-- Mobile panel indicator -->
-    <div class="fixed bottom-4 left-1/2 z-40 -translate-x-1/2">
-      <div class="flex items-center gap-2 rounded-full border border-border bg-bg-card/90 px-3 py-1.5 backdrop-blur-md">
+    <!-- Mobile panel indicator with labels -->
+    <div class="fixed bottom-3 left-1/2 z-40 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm">
+      <div class="flex items-center justify-between rounded-xl border border-border bg-bg-card/95 px-1 py-1 backdrop-blur-md">
         <button
           v-for="(label, index) in panelLabels"
           :key="label"
-          class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+          class="flex flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 transition-all duration-300 cursor-pointer"
           :class="index === currentPanelIndex
-            ? 'w-5 bg-accent shadow-[0_0_8px_rgba(0,255,136,0.5)]'
-            : 'w-1.5 bg-text-muted/30'"
-          :aria-label="`Go to ${label}`"
+            ? 'bg-accent/15 text-accent'
+            : 'text-text-muted'"
           @click="scrollToPanel(index)"
-        />
+        >
+          <span
+            class="h-1 rounded-full transition-all duration-300"
+            :class="index === currentPanelIndex
+              ? 'w-4 bg-accent shadow-[0_0_8px_rgba(0,255,136,0.5)]'
+              : 'w-1 bg-text-muted/30'"
+          />
+          <span class="text-[0.55rem] font-mono leading-none">{{ label }}</span>
+        </button>
       </div>
     </div>
   </div>

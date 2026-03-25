@@ -39,22 +39,35 @@ export function useHorizontalScroll(
   // === MOBILE: scroll-snap based navigation ===
   function setupMobile(): void {
     if (!containerRef.value) return
-
-    // Listen to native scroll for progress tracking
     containerRef.value.addEventListener('scroll', handleMobileScroll, { passive: true })
+    // Also listen to scrollend for precise snap position
+    containerRef.value.addEventListener('scrollend', handleMobileScrollEnd, { passive: true } as AddEventListenerOptions)
   }
 
   function handleMobileScroll(): void {
     if (!containerRef.value) return
     const el = containerRef.value
-    const maxScroll = el.scrollWidth - el.clientWidth
-    if (maxScroll > 0) {
-      progress.value = el.scrollLeft / maxScroll
+    const panelWidth = el.clientWidth
+    if (panelWidth > 0) {
+      progress.value = el.scrollLeft / (panelWidth * (panelCount - 1))
+    }
+  }
+
+  function handleMobileScrollEnd(): void {
+    if (!containerRef.value) return
+    const el = containerRef.value
+    const panelWidth = el.clientWidth
+    if (panelWidth > 0) {
+      // Snap to exact panel index for precise indicator
+      const exactIndex = Math.round(el.scrollLeft / panelWidth)
+      progress.value = exactIndex / (panelCount - 1)
     }
   }
 
   function cleanupMobile(): void {
-    containerRef.value?.removeEventListener('scroll', handleMobileScroll)
+    if (!containerRef.value) return
+    containerRef.value.removeEventListener('scroll', handleMobileScroll)
+    containerRef.value.removeEventListener('scrollend', handleMobileScrollEnd)
   }
 
   // === DESKTOP: GSAP ScrollTrigger horizontal scroll ===
