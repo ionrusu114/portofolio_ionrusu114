@@ -60,4 +60,29 @@
     background-color: var(--color-accent-dark);
     color: var(--color-accent);
   }
+
+  /* Neon scrollbar — global */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 136, 0.2) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 136, 0.15);
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 6px rgba(0, 255, 136, 0.3);
+  }
 }
