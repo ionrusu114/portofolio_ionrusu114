@@ -15,6 +15,7 @@ interface UseHorizontalScrollReturn {
   progress: Ref<number>
   currentPanelIndex: Ref<number>
   scrollToPanel: (index: number) => void
+  isMobile: Ref<boolean>
   timeline: () => gsap.core.Timeline | null
 }
 
@@ -26,25 +27,38 @@ export function useHorizontalScroll(
   const { panelCount, scrubSpeed = 1 } = options
 
   const progress = ref(0)
+  const isMobile = ref(false)
   const currentPanelIndex = computed(() =>
     Math.round(progress.value * (panelCount - 1)),
   )
 
   let tl: gsap.core.Timeline | null = null
   let st: ScrollTrigger | null = null
+  let mql: MediaQueryList | null = null
 
-  function scrollToPanel(index: number): void {
-    if (!st) return
-    const targetProgress = index / (panelCount - 1)
-    const scrollPos = st.start + targetProgress * (st.end - st.start)
-    gsap.to(window, {
-      scrollTo: { y: scrollPos, autoKill: false },
-      duration: 0.8,
-      ease: 'power2.inOut',
-    })
+  // === MOBILE: scroll-snap based navigation ===
+  function setupMobile(): void {
+    if (!containerRef.value) return
+
+    // Listen to native scroll for progress tracking
+    containerRef.value.addEventListener('scroll', handleMobileScroll, { passive: true })
   }
 
-  onMounted(() => {
+  function handleMobileScroll(): void {
+    if (!containerRef.value) return
+    const el = containerRef.value
+    const maxScroll = el.scrollWidth - el.clientWidth
+    if (maxScroll > 0) {
+      progress.value = el.scrollLeft / maxScroll
+    }
+  }
+
+  function cleanupMobile(): void {
+    containerRef.value?.removeEventListener('scroll', handleMobileScroll)
+  }
+
+  // === DESKTOP: GSAP ScrollTrigger horizontal scroll ===
+  function setupDesktop(): void {
     if (!wrapperRef.value || !containerRef.value) return
 
     const movePercent = ((panelCount - 1) / panelCount) * 100
@@ -76,14 +90,79 @@ export function useHorizontalScroll(
       ease: 'none',
     })
 
-    // Store the ScrollTrigger instance directly
     st = tl.scrollTrigger as ScrollTrigger
+  }
+
+  function cleanupDesktop(): void {
+    tl?.kill()
+    st?.kill()
+    tl = null
+    st = null
+    // Reset any GSAP-applied styles
+    if (containerRef.value) {
+      gsap.set(containerRef.value, { clearProps: 'all' })
+    }
+    if (wrapperRef.value) {
+      gsap.set(wrapperRef.value, { clearProps: 'all' })
+    }
+    ScrollTrigger.refresh()
+  }
+
+  // === SCROLL TO PANEL (works for both modes) ===
+  function scrollToPanel(index: number): void {
+    if (isMobile.value) {
+      if (!containerRef.value) return
+      const panelWidth = containerRef.value.clientWidth
+      containerRef.value.scrollTo({
+        left: index * panelWidth,
+        behavior: 'smooth',
+      })
+    } else {
+      if (!st) return
+      const targetProgress = index / (panelCount - 1)
+      const scrollPos = st.start + targetProgress * (st.end - st.start)
+      gsap.to(window, {
+        scrollTo: { y: scrollPos, autoKill: false },
+        duration: 0.8,
+        ease: 'power2.inOut',
+      })
+    }
+  }
+
+  // === LIFECYCLE ===
+  function handleMediaChange(e: MediaQueryListEvent): void {
+    const wasMobile = isMobile.value
+    isMobile.value = e.matches
+
+    if (wasMobile && !isMobile.value) {
+      cleanupMobile()
+      // Small delay to let DOM update
+      setTimeout(() => setupDesktop(), 50)
+    } else if (!wasMobile && isMobile.value) {
+      cleanupDesktop()
+      setTimeout(() => setupMobile(), 50)
+    }
+  }
+
+  onMounted(() => {
+    mql = window.matchMedia('(max-width: 767px)')
+    isMobile.value = mql.matches
+    mql.addEventListener('change', handleMediaChange)
+
+    if (isMobile.value) {
+      setupMobile()
+    } else {
+      setupDesktop()
+    }
   })
 
   onUnmounted(() => {
-    tl?.kill()
-    st = null
-    tl = null
+    mql?.removeEventListener('change', handleMediaChange)
+    if (isMobile.value) {
+      cleanupMobile()
+    } else {
+      cleanupDesktop()
+    }
   })
 
   provide(ScrollProgressKey, progress)
@@ -94,6 +173,7 @@ export function useHorizontalScroll(
     progress,
     currentPanelIndex,
     scrollToPanel,
+    isMobile,
     timeline: () => tl,
   }
 }

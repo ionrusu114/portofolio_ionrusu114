@@ -16,10 +16,17 @@ const isVisible = computed(() => {
     :class="{ 'scroll-indicator--hidden': !isVisible }"
     aria-hidden="true"
   >
-    <div class="scroll-indicator__mouse">
+    <!-- Desktop: mouse icon -->
+    <div class="scroll-indicator__mouse hidden md:flex">
       <div class="scroll-indicator__wheel" />
     </div>
-    <span class="scroll-indicator__text">Scroll to explore</span>
+    <!-- Mobile: swipe arrows -->
+    <div class="scroll-indicator__swipe flex md:hidden">
+      <span class="scroll-indicator__arrow">&#8592;</span>
+      <span class="scroll-indicator__arrow">&#8594;</span>
+    </div>
+    <span class="scroll-indicator__text hidden md:block">Scroll to explore</span>
+    <span class="scroll-indicator__text block md:hidden">Swipe to explore</span>
   </div>
 </template>
 
@@ -43,7 +50,6 @@ const isVisible = computed(() => {
   height: 38px;
   border: 2px solid var(--color-text-muted);
   border-radius: 12px;
-  display: flex;
   justify-content: center;
   padding-top: 6px;
 }
@@ -56,6 +62,25 @@ const isVisible = computed(() => {
   animation: scroll-wheel 1.8s ease-in-out infinite;
 }
 
+.scroll-indicator__swipe {
+  gap: 1rem;
+  align-items: center;
+}
+
+.scroll-indicator__arrow {
+  font-size: 1.2rem;
+  color: var(--color-accent);
+  animation: swipe-hint 2s ease-in-out infinite;
+}
+
+.scroll-indicator__arrow:first-child {
+  animation-name: swipe-left;
+}
+
+.scroll-indicator__arrow:last-child {
+  animation-name: swipe-right;
+}
+
 .scroll-indicator__text {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -65,17 +90,18 @@ const isVisible = computed(() => {
 }
 
 @keyframes scroll-wheel {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.5; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes swipe-left {
+  0%, 100% { transform: translateX(0); opacity: 0.5; }
+  50% { transform: translateX(-6px); opacity: 1; }
+}
+
+@keyframes swipe-right {
+  0%, 100% { transform: translateX(0); opacity: 0.5; }
+  50% { transform: translateX(6px); opacity: 1; }
 }
 </style>

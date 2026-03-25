@@ -6,9 +6,10 @@ import { personal } from '@/data/personal'
 
 <template>
   <BasePanel id="about">
-    <div class="flex h-full flex-col justify-center gap-4 py-4 overflow-y-auto
+    <div class="flex flex-col gap-4 py-4
                 sm:gap-6 sm:py-6
-                lg:flex-row lg:items-center lg:gap-16 lg:overflow-y-visible lg:py-8">
+                md:h-full md:justify-center
+                lg:flex-row lg:items-center lg:gap-16 lg:py-8">
       <!-- Left: Profile -->
       <div class="flex flex-col gap-4 sm:gap-6 lg:w-1/2">
         <div>

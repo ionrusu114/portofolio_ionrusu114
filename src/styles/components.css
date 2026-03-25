@@ -58,6 +58,18 @@
     @apply h-screen w-screen flex-shrink-0 relative overflow-hidden;
   }
 
+  /* Mobile: panels are scroll-snap targets with vertical scroll */
+  @media (max-width: 767px) {
+    .panel {
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+  }
+
   .glow-text {
     text-shadow: 0 0 20px rgba(0, 255, 136, 0.4), 0 0 40px rgba(0, 255, 136, 0.2);
   }

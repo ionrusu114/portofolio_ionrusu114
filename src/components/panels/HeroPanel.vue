@@ -11,7 +11,8 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
 
 <template>
   <BasePanel id="hero">
-    <div class="flex h-full flex-col items-center justify-center gap-6
+    <div class="flex flex-col items-center justify-center gap-6
+                md:h-full
                 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
       <!-- Text content -->
       <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
