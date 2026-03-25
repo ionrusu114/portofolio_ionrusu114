@@ -6,6 +6,7 @@ import ChatActionMessage from '@/components/chat/ChatActionMessage.vue'
 import ChatOfferCard from '@/components/chat/ChatOfferCard.vue'
 import ChatTypingIndicator from '@/components/chat/ChatTypingIndicator.vue'
 import ChatCustomBudgetInput from '@/components/chat/ChatCustomBudgetInput.vue'
+import ChatContactForm from '@/components/chat/ChatContactForm.vue'
 
 const {
   messages,
@@ -14,11 +15,13 @@ const {
   isRateLimited,
   canSendMessage,
   initialize,
+  selectLanguage,
   sendMessage,
   selectBudget,
   submitCustomBudget,
   selectTimeline,
   handleOfferResponse,
+  submitContact,
 } = useOfferChat()
 
 const inputMessage = ref('')
@@ -38,7 +41,9 @@ function handleKeydown(e: KeyboardEvent): void {
 }
 
 function handleActionSelect(actionId: string, actionType: string): void {
-  if (actionType === 'budget-select') {
+  if (actionType === 'language-select') {
+    selectLanguage(actionId)
+  } else if (actionType === 'budget-select') {
     selectBudget(actionId)
   } else if (actionType === 'timeline-select') {
     selectTimeline(actionId)
@@ -49,6 +54,10 @@ function handleActionSelect(actionId: string, actionType: string): void {
 
 function handleCustomBudget(min: number, max: number): void {
   submitCustomBudget(min, max)
+}
+
+function handleContact(contact: { email: string; phone: string }): void {
+  submitContact(contact)
 }
 
 function scrollToBottom(): void {
@@ -106,12 +115,12 @@ onMounted(() => {
     <div
       v-else
       ref="messagesContainer"
-      class="flex-1 space-y-3 overflow-y-auto p-4"
+      class="chat-scrollbar flex-1 space-y-3 overflow-y-auto p-4"
     >
       <template v-for="msg in messages" :key="msg.id">
-        <!-- Action message (budget/timeline/confirm buttons) -->
+        <!-- Action message (language/budget/timeline/confirm buttons) -->
         <ChatActionMessage
-          v-if="msg.actionType && msg.actionType !== 'custom-budget'"
+          v-if="msg.actionType && msg.actionType !== 'custom-budget' && msg.actionType !== 'contact-form'"
           :message="msg"
           @select="(id) => handleActionSelect(id, msg.actionType!)"
         />
@@ -122,6 +131,15 @@ onMounted(() => {
           <ChatCustomBudgetInput
             v-if="currentStep === 'custom-budget'"
             @submit="handleCustomBudget"
+          />
+        </div>
+
+        <!-- Contact form -->
+        <div v-else-if="msg.actionType === 'contact-form'" class="flex flex-col gap-2">
+          <BaseChatBubble role="assistant">{{ msg.content }}</BaseChatBubble>
+          <ChatContactForm
+            v-if="currentStep === 'awaiting-contact'"
+            @submit="handleContact"
           />
         </div>
 
@@ -171,3 +189,31 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Neon scrollbar */
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 3px;
+  transition: background 0.3s;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* Firefox */
+.chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 136, 0.2) transparent;
+}
+</style>
