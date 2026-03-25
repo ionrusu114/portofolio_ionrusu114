@@ -83,6 +83,7 @@ export const CurrentPanelKey: InjectionKey<Ref<number>> = Symbol('currentPanelIn
 export type OfferFlowStep =
   | 'rate-limited'
   | 'greeting'
+  | 'awaiting-language'
   | 'awaiting-description'
   | 'analyzing'
   | 'awaiting-budget'
@@ -90,12 +91,13 @@ export type OfferFlowStep =
   | 'awaiting-timeline'
   | 'generating-offer'
   | 'offer-presented'
+  | 'awaiting-contact'
   | 'sending-email'
   | 'completed'
   | 'declined'
   | 'error'
 
-export type ChatActionType = 'budget-select' | 'timeline-select' | 'offer-confirm' | 'custom-budget'
+export type ChatActionType = 'language-select' | 'budget-select' | 'timeline-select' | 'offer-confirm' | 'custom-budget' | 'contact-form'
 
 export interface ChatAction {
   id: string
@@ -147,10 +149,18 @@ export interface GeneratedOffer {
   disclaimer: string
 }
 
+export interface ClientContact {
+  email: string
+  phone: string
+}
+
 export interface OfferEmailPayload {
   projectDescription: string
   selectedBudget: string
   selectedTimeline: string
   generatedOffer: GeneratedOffer
+  clientContact: ClientContact
+  conversation: Array<{ role: string; content: string }>
+  language: string
   timestamp: number
 }
