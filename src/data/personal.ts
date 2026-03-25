@@ -5,7 +5,7 @@ export const personal = {
   experience: '5+',
   email: 'ionrusu114@gmail.com',
   phone: '+40756754066',
-  linkedin: 'https://www.linkedin.com/in/ionrusu114',
+  linkedin: 'https://www.linkedin.com/in/ion-rusu-discultu',
   github: 'https://github.com/ionrusu114',
   location: 'Romania',
   education: {
