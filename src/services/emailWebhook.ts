@@ -7,7 +7,7 @@ export async function sendOfferEmail(payload: OfferEmailPayload): Promise<{ succ
     throw new Error('Google Apps Script webhook URL is not configured')
   }
 
-  const response = await fetch(WEBHOOK_URL, {
+  await fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
