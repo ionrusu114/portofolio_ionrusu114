@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import { useHead } from '@unhead/vue'
 import { useRouter } from 'vue-router'
+
+useHead({
+  title: 'Page Not Found — Ion Rusu',
+  meta: [
+    { name: 'robots', content: 'noindex' },
+  ],
+})
 
 const router = useRouter()
 

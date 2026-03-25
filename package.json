@@ -15,6 +15,7 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@unhead/vue": "^2.1.12",
     "gsap": "^3.14.2",
     "oh-vue-icons": "^1.0.0-rc3",
     "three": "^0.183.2",

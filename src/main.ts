@@ -37,6 +37,7 @@ import {
   SiExpress,
 } from 'oh-vue-icons/icons'
 
+import { createHead } from '@unhead/vue'
 import { router } from '@/router'
 import App from '@/App.vue'
 import '@/styles/main.css'
@@ -52,6 +53,8 @@ addIcons(
 )
 
 const app = createApp(App)
+const head = createHead()
+app.use(head)
 
 app.component('VIcon', OhVueIcon)
 app.use(router)
