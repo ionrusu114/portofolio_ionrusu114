@@ -10,15 +10,13 @@ import ContactPanel from '@/components/panels/ContactPanel.vue'
 </script>
 
 <template>
-  <TheBackgroundCanvas />
-
   <TheHorizontalScroller>
     <HeroPanel />
     <AboutPanel />
     <ProjectsPanel />
     <GetOfferPanel />
     <ContactPanel />
+    <TheBackgroundCanvas />
+    <TheNavMenu />
   </TheHorizontalScroller>
-
-  <TheNavMenu />
 </template>
