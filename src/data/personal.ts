@@ -1,7 +1,7 @@
 export const personal = {
   name: 'Ion Rusu',
   fullName: 'Rusu-Discultu Ion',
-  title: 'Web Application Architect & Developer',
+  title: 'Web Architect & Full-Stack Developer',
   experience: '5+',
   email: 'ionrusu114@gmail.com',
   phone: '+40756754066',

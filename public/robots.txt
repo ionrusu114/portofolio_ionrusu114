@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ionrusu114.pro/sitemap.xml
+
+# Disallow crawling of API endpoints
+Disallow: /api/
