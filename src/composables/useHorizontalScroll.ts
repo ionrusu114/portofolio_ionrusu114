@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted, provide, watch, type Ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted, provide, watch, nextTick, type Ref } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
@@ -157,10 +157,13 @@ export function useHorizontalScroll(
     }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     mql = window.matchMedia('(max-width: 767px)')
     isMobile.value = mql.matches
     mql.addEventListener('change', handleMediaChange)
+
+    // Wait for DOM to update with correct isMobile classes
+    await nextTick()
 
     if (isMobile.value) {
       setupMobile()

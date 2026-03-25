@@ -15,55 +15,39 @@ const { isMobile, currentPanelIndex, scrollToPanel } = useHorizontalScroll(wrapp
 </script>
 
 <template>
-  <!-- Mobile: horizontal scroll-snap -->
   <div
-    v-if="isMobile"
     ref="wrapperRef"
-    class="relative h-dvh w-screen"
+    class="w-screen"
+    :class="isMobile ? 'h-dvh' : 'h-screen overflow-hidden'"
   >
     <div
       ref="containerRef"
-      class="mobile-scroller flex h-full snap-x snap-mandatory overflow-x-auto"
+      class="flex"
+      :class="isMobile
+        ? 'h-full snap-x snap-mandatory overflow-x-auto mobile-scroller'
+        : 'h-screen'"
+      :style="isMobile ? undefined : { width: `${panels.length * 100}vw` }"
     >
       <slot />
     </div>
 
-    <!-- Mobile panel indicator with labels -->
-    <div class="fixed bottom-3 left-1/2 z-40 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm">
-      <div class="flex items-center justify-between rounded-xl border border-border bg-bg-card/95 px-1 py-1 backdrop-blur-md">
+    <!-- Mobile panel dots -->
+    <div
+      v-if="isMobile"
+      class="fixed bottom-4 left-1/2 z-40 -translate-x-1/2"
+    >
+      <div class="flex items-center gap-2.5 rounded-full border border-border bg-bg-card/90 px-3.5 py-2 backdrop-blur-md">
         <button
           v-for="(label, index) in panelLabels"
           :key="label"
-          class="flex flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 transition-all duration-300 cursor-pointer"
+          class="h-2 rounded-full transition-all duration-300 cursor-pointer"
           :class="index === currentPanelIndex
-            ? 'bg-accent/15 text-accent'
-            : 'text-text-muted'"
+            ? 'w-6 bg-accent shadow-[0_0_10px_rgba(0,255,136,0.6)]'
+            : 'w-2 bg-text-muted/30 hover:bg-text-muted/50'"
+          :aria-label="`Go to ${label}`"
           @click="scrollToPanel(index)"
-        >
-          <span
-            class="h-1 rounded-full transition-all duration-300"
-            :class="index === currentPanelIndex
-              ? 'w-4 bg-accent shadow-[0_0_8px_rgba(0,255,136,0.5)]'
-              : 'w-1 bg-text-muted/30'"
-          />
-          <span class="text-[0.55rem] font-mono leading-none">{{ label }}</span>
-        </button>
+        />
       </div>
-    </div>
-  </div>
-
-  <!-- Desktop: GSAP horizontal scroll -->
-  <div
-    v-else
-    ref="wrapperRef"
-    class="h-screen w-screen overflow-hidden"
-  >
-    <div
-      ref="containerRef"
-      class="flex h-screen"
-      :style="{ width: `${panels.length * 100}vw` }"
-    >
-      <slot />
     </div>
   </div>
 </template>
