@@ -15,5 +15,5 @@ function handleIntroComplete(): void {
     v-if="shouldShowIntro"
     @complete="handleIntroComplete"
   />
-  <RouterView v-show="!shouldShowIntro" />
+  <RouterView v-if="!shouldShowIntro" />
 </template>
