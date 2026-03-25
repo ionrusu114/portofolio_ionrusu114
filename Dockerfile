@@ -16,12 +16,14 @@ RUN bun run build
 # Stage 2: Serve
 FROM nginx:1.27-alpine
 
+RUN apk add --no-cache curl
+
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://localhost/health || exit 1
+  CMD curl -f http://localhost/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
