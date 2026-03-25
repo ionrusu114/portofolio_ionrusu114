@@ -39,3 +39,9 @@ vite.config.ts.timestamp-*
 
 # Docker (local compose only)
 docker-compose*.yml
+
+# Test output
+vitest_output*
+
+# Plans / docs artifacts
+docs/plans/
