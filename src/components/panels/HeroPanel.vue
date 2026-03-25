@@ -2,6 +2,7 @@
 import { inject } from 'vue'
 import BasePanel from '@/components/ui/BasePanel.vue'
 import BaseGlowText from '@/components/ui/BaseGlowText.vue'
+import ScrollIndicator from '@/components/ui/ScrollIndicator.vue'
 import { personal } from '@/data/personal'
 import { ScrollToPanelKey } from '@/types'
 
@@ -54,6 +55,11 @@ const scrollToPanel = inject(ScrollToPanelKey, () => {})
         </div>
         <div class="glow-border absolute -inset-1 -z-10 rounded-2xl opacity-50 transition-opacity duration-700 group-hover:opacity-100" />
       </div>
+    </div>
+
+    <!-- Scroll indicator at bottom of panel -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
+      <ScrollIndicator />
     </div>
   </BasePanel>
 </template>
