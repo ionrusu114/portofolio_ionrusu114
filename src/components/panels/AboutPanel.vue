@@ -6,10 +6,11 @@ import { personal } from '@/data/personal'
 
 <template>
   <BasePanel id="about">
-    <div class="flex h-full flex-col justify-center gap-8 py-8
-                lg:flex-row lg:items-center lg:gap-16">
+    <div class="flex h-full flex-col justify-center gap-4 py-4 overflow-y-auto
+                sm:gap-6 sm:py-6
+                lg:flex-row lg:items-center lg:gap-16 lg:overflow-y-visible lg:py-8">
       <!-- Left: Profile -->
-      <div class="flex flex-col gap-6 lg:w-1/2">
+      <div class="flex flex-col gap-4 sm:gap-6 lg:w-1/2">
         <div>
           <p class="mb-2 font-mono text-xs uppercase tracking-widest text-accent">
             // about me
@@ -24,7 +25,7 @@ import { personal } from '@/data/personal'
         </p>
 
         <!-- Capabilities -->
-        <div class="grid grid-cols-2 gap-3 text-sm">
+        <div class="grid grid-cols-2 gap-2 text-xs sm:gap-3 sm:text-sm">
           <div class="flex items-center gap-2 text-text-secondary">
             <VIcon name="bi-code-slash" scale="0.9" class="text-accent" />
             Custom Web Apps
@@ -44,7 +45,7 @@ import { personal } from '@/data/personal'
         </div>
 
         <!-- Education & Languages -->
-        <div class="flex flex-col gap-4 border-t border-border pt-4 text-sm">
+        <div class="flex flex-col gap-3 border-t border-border pt-3 text-xs sm:gap-4 sm:pt-4 sm:text-sm">
           <div>
             <span class="font-mono text-xs uppercase text-text-muted">// education</span>
             <p class="mt-1 text-text-secondary">

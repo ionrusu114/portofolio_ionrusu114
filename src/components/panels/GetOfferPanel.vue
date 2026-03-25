@@ -15,7 +15,7 @@ import TimelineSelectorSection from '@/components/sections/TimelineSelectorSecti
         <h2 class="heading-2">Let's Build Something</h2>
       </div>
 
-      <div class="grid h-[60vh] grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+      <div class="grid h-[50vh] grid-cols-1 gap-4 sm:h-[55vh] sm:gap-6 lg:h-[60vh] lg:grid-cols-[1fr_320px]">
         <!-- Chat interface -->
         <ChatInterfaceSection />
 
