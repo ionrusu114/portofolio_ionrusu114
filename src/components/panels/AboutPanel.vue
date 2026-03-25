@@ -7,7 +7,7 @@ import { personal } from '@/data/personal'
 <template>
   <BasePanel id="about">
     <div class="flex h-full flex-col justify-center gap-8 py-8
-                lg:flex-row lg:items-start lg:gap-16">
+                lg:flex-row lg:items-center lg:gap-16">
       <!-- Left: Profile -->
       <div class="flex flex-col gap-6 lg:w-1/2">
         <div>

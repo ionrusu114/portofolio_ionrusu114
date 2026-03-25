@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import TheHorizontalScroller from '@/components/layout/TheHorizontalScroller.vue'
-import TheNavIndicator from '@/components/layout/TheNavIndicator.vue'
 import TheNavMenu from '@/components/layout/TheNavMenu.vue'
 import TheBackgroundCanvas from '@/components/three/TheBackgroundCanvas.vue'
 import HeroPanel from '@/components/panels/HeroPanel.vue'
@@ -21,6 +20,5 @@ import ContactPanel from '@/components/panels/ContactPanel.vue'
     <ContactPanel />
   </TheHorizontalScroller>
 
-  <TheNavIndicator />
   <TheNavMenu />
 </template>
