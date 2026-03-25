@@ -28,19 +28,27 @@ import { personal } from '@/data/personal'
         <div class="grid grid-cols-2 gap-2 text-xs sm:gap-3 sm:text-sm">
           <div class="flex items-center gap-2 text-text-secondary">
             <VIcon name="bi-code-slash" scale="0.9" class="text-accent" />
-            Custom Web Apps
+            Vue / Nuxt / TypeScript
           </div>
           <div class="flex items-center gap-2 text-text-secondary">
             <VIcon name="bi-globe" scale="0.9" class="text-accent" />
-            Full-Stack Solutions
+            FastAPI / Python
           </div>
           <div class="flex items-center gap-2 text-text-secondary">
             <VIcon name="bi-chat" scale="0.9" class="text-accent" />
-            Bots & Automation
+            PostgreSQL / Redis
           </div>
           <div class="flex items-center gap-2 text-text-secondary">
             <VIcon name="bi-clipboard" scale="0.9" class="text-accent" />
-            DevOps & Consulting
+            Docker / Kubernetes
+          </div>
+          <div class="flex items-center gap-2 text-text-secondary">
+            <VIcon name="bi-arrow-repeat" scale="0.9" class="text-accent" />
+            CI/CD / GitLab / GitHub
+          </div>
+          <div class="flex items-center gap-2 text-text-secondary">
+            <VIcon name="bi-graph-up" scale="0.9" class="text-accent" />
+            Grafana / Prometheus
           </div>
         </div>
 
